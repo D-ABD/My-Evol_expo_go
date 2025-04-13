@@ -1,13 +1,13 @@
-import { ScreenContent } from 'components/ScreenContent';
-import { StatusBar } from 'expo-status-bar';
+// App.tsx
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import MyEvolApp from './components/MyEvolApp';
 import './global.css';
 
 export default function App() {
   return (
-    <>
-      <ScreenContent title="Home" path="App.tsx" />
-      <StatusBar style="auto" />
-    </>
+    <SafeAreaProvider>
+      <MyEvolApp />
+    </SafeAreaProvider>
   );
 }
