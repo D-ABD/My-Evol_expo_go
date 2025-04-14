@@ -30,6 +30,8 @@ export type Stats = {
   totalEntries: number;
   currentStreak: number;
   level: number;
+  moodData?: number[]; // Propriété optionnelle
+  categoryDistribution?: Record<string, number>; // Propriété optionnelle
 };
 
 // Types pour les props des composants
@@ -60,4 +62,23 @@ export type SettingsTabProps = {
   notifications: boolean;
   setNotifications: (value: boolean) => void;
   quietHours: QuietHours;
+};
+
+export type Badge = {
+  id: number;
+  name: string;
+  icon: string;
+  description: string;
+  unlocked: boolean;
+  date?: string;
+};
+
+export type Challenge = {
+  id: number;
+  title: string;
+  description: string;
+  duration: number;
+  progress: number;
+  totalDays: number;
+  participants?: number;
 };

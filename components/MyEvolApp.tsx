@@ -1,22 +1,25 @@
 // my-expo-app/components/MyEvolApp.tsx
 
-import { Book, BarChart2, Target, User, Settings } from 'lucide-react-native';
+import { Book, BarChart2, Target, User, Settings, Trophy } from 'lucide-react-native';
 import { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import '../global.css';
+import Journal from './journal';
+import Dashboard from '../components/Dashboard';
+import Gamification from '../components/Gamification'; // Importation de la gamification
 import Objectives from '../components/Objectives';
 import Parametres from '../components/Parametres'; // Renommé pour éviter le conflit
 import Stats from '../components/Stats';
-import Journal from '../components/journal';
 import { Entry, Objective, QuietHours, Stats as StatsType } from '../types/types';
 
 export default function MyEvolApp() {
   // États principaux de l'application
-  const [activeTab, setActiveTab] = useState<'Journal' | 'Stats' | 'Objectifs' | 'Paramètres'>(
-    'Journal'
-  );
+  const [activeTab, setActiveTab] = useState<
+    'Dashboard' | 'Journal' | 'Stats' | 'Objectifs' | 'Gamification' | 'Paramètres'
+  >('Dashboard');
+
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [quietHours] = useState<QuietHours>({ start: '22:00', end: '07:00' });
@@ -66,6 +69,8 @@ export default function MyEvolApp() {
   // Rendu de l'onglet en fonction de la sélection
   const renderTab = () => {
     switch (activeTab) {
+      case 'Dashboard':
+        return <Dashboard />;
       case 'Journal':
         return (
           <Journal
@@ -85,6 +90,8 @@ export default function MyEvolApp() {
         return <Stats stats={stats} />;
       case 'Objectifs':
         return <Objectives objectives={objectives} />;
+      case 'Gamification':
+        return <Gamification />;
       case 'Paramètres':
         return (
           <Parametres
@@ -102,9 +109,11 @@ export default function MyEvolApp() {
 
   // Configuration des onglets
   const tabs = [
+    { name: 'Dashboard', icon: BarChart2 },
     { name: 'Journal', icon: Book },
     { name: 'Stats', icon: BarChart2 },
     { name: 'Objectifs', icon: Target },
+    { name: 'Gamification', icon: Trophy },
     { name: 'Paramètres', icon: Settings },
   ];
 
