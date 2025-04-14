@@ -1,3 +1,5 @@
+// my-expo-app/components/MyEvolApp.tsx
+
 import { Book, BarChart2, Target, User, Settings } from 'lucide-react-native';
 import { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
