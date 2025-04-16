@@ -1,7 +1,7 @@
 // utils/storage.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Entry } from '../types/types';
+import { Badge, Entry, Objective } from '../types/types';
 
 export const saveEntries = async (entries: Entry[]) => {
   try {
@@ -36,5 +36,39 @@ export const loadData = async <T>(key: string): Promise<T | null> => {
   } catch (e) {
     console.error('Erreur lors du chargement:', e);
     return null;
+  }
+};
+export const saveObjectives = async (objectives: Objective[]) => {
+  try {
+    await AsyncStorage.setItem('myevol_objectives', JSON.stringify(objectives));
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des objectifs:', error);
+  }
+};
+
+export const loadObjectives = async (): Promise<Objective[]> => {
+  try {
+    const data = await AsyncStorage.getItem('myevol_objectives');
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Erreur lors du chargement des objectifs:', error);
+    return [];
+  }
+};
+export const saveBadges = async (badges: Badge[]) => {
+  try {
+    await AsyncStorage.setItem('myevol_badges', JSON.stringify(badges));
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des badges:', error);
+  }
+};
+
+export const loadBadges = async (): Promise<Badge[]> => {
+  try {
+    const data = await AsyncStorage.getItem('myevol_badges');
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Erreur lors du chargement des badges:', error);
+    return [];
   }
 };

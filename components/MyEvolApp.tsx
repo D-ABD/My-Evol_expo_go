@@ -11,9 +11,16 @@ import Gamification from '../components/Gamification';
 import Objectives from '../components/Objectives';
 import Parametres from '../components/Parametres';
 import Stats from '../components/Stats';
-import { Entry, Objective, QuietHours, Stats as StatsType } from '../types/types';
-import { saveEntries, loadEntries, saveData, loadData } from '../utils/storage';
-import Card from './ui/Card'; // ✅ On utilise Card
+import { Entry, Objective, QuietHours, Stats as StatsType, Badge } from '../types/types';
+import {
+  saveEntries,
+  loadEntries,
+  saveData,
+  loadData,
+  saveObjectives,
+  loadObjectives,
+} from '../utils/storage';
+import Card from './ui/Card';
 
 export default function MyEvolApp() {
   const [activeTab, setActiveTab] = useState<
@@ -30,11 +37,8 @@ export default function MyEvolApp() {
   const [mood, setMood] = useState(5);
   const [isRecording, setIsRecording] = useState(false);
 
-  const [objectives] = useState<Objective[]>([
-    { id: 1, category: 'Forme Physique', target: 5, current: 3, percentage: 60 },
-    { id: 2, category: 'Bien-être Mental', target: 3, current: 3, percentage: 100 },
-    { id: 3, category: 'Relations', target: 4, current: 1, percentage: 25 },
-  ]);
+  const [objectives, setObjectives] = useState<Objective[]>([]);
+  const [badges, setBadges] = useState<Badge[]>([]);
 
   const [stats, setStats] = useState<StatsType>({
     todayEntries: 0,
@@ -47,12 +51,45 @@ export default function MyEvolApp() {
 
   useEffect(() => {
     const loadDataOnStart = async () => {
-      const loadedEntries = await loadEntries();
-      const loadedStats = await loadData<StatsType>('myevol_stats');
+      const [loadedEntries, loadedStats, loadedObjectives] = await Promise.all([
+        loadEntries(),
+        loadData<StatsType>('myevol_stats'),
+        loadObjectives(), // ✅ Utilise la fonction dédiée
+      ]);
 
       if (loadedEntries) setEntries(loadedEntries);
       if (loadedStats) setStats(loadedStats);
+
+      if (!loadedObjectives || loadedObjectives.length === 0) {
+        const defaultObjectives: Objective[] = [
+          { id: 1, category: 'Forme Physique', target: 5, current: 2, percentage: 40 },
+          { id: 2, category: 'Bien-être Mental', target: 3, current: 3, percentage: 100 },
+        ];
+        setObjectives(defaultObjectives);
+        saveObjectives(defaultObjectives);
+      } else {
+        setObjectives(loadedObjectives);
+      }
+
+      setBadges([
+        {
+          id: 1,
+          name: 'Premier pas',
+          icon: 'https://cdn-icons-png.flaticon.com/512/3909/3909444.png',
+          description: 'Créer une première entrée',
+          unlocked: true,
+          date: '2025-04-14',
+        },
+        {
+          id: 2,
+          name: 'Série de 7 jours',
+          icon: 'https://cdn-icons-png.flaticon.com/512/888/888879.png',
+          description: '7 jours consécutifs',
+          unlocked: false,
+        },
+      ]);
     };
+
     loadDataOnStart();
   }, []);
 
@@ -109,6 +146,7 @@ export default function MyEvolApp() {
     const updated = entries.filter((e) => e.id !== id);
     setEntries(updated);
     saveEntries(updated);
+
     Toast.show({
       type: 'error',
       text1: 'Entrée supprimée ❌',
@@ -117,10 +155,21 @@ export default function MyEvolApp() {
     });
   };
 
+  const handleAddObjective = (newObjective: Objective) => {
+    const updated = [...objectives, newObjective];
+    setObjectives(updated);
+    saveObjectives(updated);
+  };
+
+  const updateObjectives = (updated: Objective[]) => {
+    setObjectives(updated);
+    saveObjectives(updated);
+  };
+
   const renderTab = () => {
     switch (activeTab) {
       case 'Dashboard':
-        return <Dashboard />;
+        return <Dashboard stats={stats} objectives={objectives} badges={badges} />;
       case 'Journal':
         return (
           <Journal
@@ -140,7 +189,13 @@ export default function MyEvolApp() {
       case 'Stats':
         return <Stats stats={stats} />;
       case 'Objectifs':
-        return <Objectives objectives={objectives} />;
+        return (
+          <Objectives
+            objectives={objectives}
+            handleAddObjective={handleAddObjective}
+            updateObjectives={updateObjectives}
+          />
+        );
       case 'Gamification':
         return <Gamification />;
       case 'Paramètres':
@@ -170,7 +225,6 @@ export default function MyEvolApp() {
   return (
     <>
       <SafeAreaView className={`flex-1 ${darkMode ? 'dark' : ''} bg-gray-100 dark:bg-black`}>
-        {/* En-tête avec Card */}
         <Card style={{ margin: 0, borderRadius: 0 }}>
           <View className="flex-row items-center justify-between">
             <Text className="text-xl font-bold text-purple-700 dark:text-white">MyEvol</Text>
@@ -184,10 +238,8 @@ export default function MyEvolApp() {
           </View>
         </Card>
 
-        {/* Contenu dynamique */}
         <View className="flex-1">{renderTab()}</View>
 
-        {/* Navigation inférieure */}
         <View className="flex-row justify-around border-t bg-white py-3 dark:bg-neutral-900">
           {tabs.map(({ name, icon: Icon }) => (
             <Pressable

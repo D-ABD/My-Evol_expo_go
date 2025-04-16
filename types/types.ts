@@ -43,7 +43,7 @@ export type JournalTabProps = {
   isRecording: boolean;
   setIsRecording: (value: boolean) => void;
   handleAddEntry: () => void;
-  handleDeleteEntry: (id: number) => void; // ✅ Ajouté ici
+  handleDeleteEntry: (id: number) => void;
   entries: Entry[];
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
@@ -55,6 +55,8 @@ export type StatsTabProps = {
 
 export type ObjectivesTabProps = {
   objectives: Objective[];
+  handleAddObjective?: (newObjective: Objective) => void;
+  updateObjectives?: (updated: Objective[]) => void;
 };
 
 export type SettingsTabProps = {
@@ -82,4 +84,10 @@ export type Challenge = {
   progress: number;
   totalDays: number;
   participants?: number;
+};
+
+export type DashboardProps = {
+  stats: Stats;
+  objectives: Objective[];
+  badges: Badge[];
 };
