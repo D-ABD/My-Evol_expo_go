@@ -1,8 +1,8 @@
-// components/Stats.tsx
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 
 import { StatsTabProps } from '../types/types';
+import Card from './ui/Card'; // 💡 Composant réutilisable
 
 const Stats = ({ stats }: StatsTabProps) => {
   const moodData = stats.moodData || [5, 6, 7, 6, 8, 7, 9];
@@ -18,32 +18,32 @@ const Stats = ({ stats }: StatsTabProps) => {
 
   return (
     <ScrollView className="p-4">
-      {/* Stats principales */}
+      {/* Statistiques principales */}
       <View className="mb-4 flex-row justify-between">
-        <View className="w-[48%] rounded-lg bg-white p-4 dark:bg-neutral-900">
+        <Card className="w-[48%]">
           <Text className="text-gray-500 dark:text-gray-300">Aujourd'hui</Text>
           <Text className="text-2xl font-bold dark:text-white">{stats.todayEntries}</Text>
-        </View>
-        <View className="w-[48%] rounded-lg bg-white p-4 dark:bg-neutral-900">
+        </Card>
+        <Card className="w-[48%]">
           <Text className="text-gray-500 dark:text-gray-300">Total</Text>
           <Text className="text-2xl font-bold dark:text-white">{stats.totalEntries}</Text>
-        </View>
+        </Card>
       </View>
 
       {/* Autres infos */}
       <View className="mb-4 flex-row justify-between">
-        <View className="w-[48%] rounded-lg bg-white p-4 dark:bg-neutral-900">
+        <Card className="w-[48%]">
           <Text className="text-gray-500 dark:text-gray-300">Série actuelle</Text>
           <Text className="text-2xl font-bold dark:text-white">{stats.currentStreak} jours</Text>
-        </View>
-        <View className="w-[48%] rounded-lg bg-white p-4 dark:bg-neutral-900">
+        </Card>
+        <Card className="w-[48%]">
           <Text className="text-gray-500 dark:text-gray-300">Niveau</Text>
           <Text className="text-2xl font-bold dark:text-white">{stats.level}</Text>
-        </View>
+        </Card>
       </View>
 
       {/* Graphique humeur */}
-      <View className="mb-4 rounded-lg bg-white p-4 dark:bg-neutral-900">
+      <Card className="mb-4">
         <Text className="mb-4 text-lg font-semibold dark:text-white">Évolution de l'humeur</Text>
         <View className="mt-2 h-40">
           <View className="absolute h-full w-full justify-between">
@@ -68,10 +68,10 @@ const Stats = ({ stats }: StatsTabProps) => {
             </Text>
           ))}
         </View>
-      </View>
+      </Card>
 
-      {/* Répartition catégorie */}
-      <View className="mb-4 rounded-lg bg-white p-4 dark:bg-neutral-900">
+      {/* Répartition par catégorie */}
+      <Card className="mb-4">
         <Text className="mb-4 text-lg font-semibold dark:text-white">
           Répartition par catégorie
         </Text>
@@ -89,7 +89,7 @@ const Stats = ({ stats }: StatsTabProps) => {
             </View>
           </View>
         ))}
-      </View>
+      </Card>
     </ScrollView>
   );
 };

@@ -21,4 +21,20 @@ export const loadEntries = async (): Promise<Entry[]> => {
   }
 };
 
-// Ajoutez des fonctions similaires pour objectives, settings, etc.
+export const saveData = async (key: string, data: any) => {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.error('Erreur lors de la sauvegarde:', e);
+  }
+};
+
+export const loadData = async <T>(key: string): Promise<T | null> => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key);
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.error('Erreur lors du chargement:', e);
+    return null;
+  }
+};

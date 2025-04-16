@@ -1,29 +1,33 @@
-// my-evol-app/
-import { Mic } from 'lucide-react-native';
+import { Mic, Trash2 } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, TextInput, ScrollView, Pressable } from 'react-native';
 
+import Card from './ui/Card'; // ✅ Remplace le style shadow
 import { Entry, JournalTabProps } from '../types/types';
 
-// Composant individuel d'entrée de journal
-export const JournalEntry = ({ entry }: { entry: Entry }) => {
+export const JournalEntry = ({
+  entry,
+  onDelete,
+}: {
+  entry: Entry;
+  onDelete: (id: number) => void;
+}) => {
   return (
-    <View className="mb-2 rounded-lg bg-white p-4 dark:bg-neutral-900">
-      <View className="mb-1 flex-row justify-between">
+    <Card style={{ marginBottom: 8 }}>
+      <View className="mb-1 flex-row items-center justify-between">
         <Text className="text-purple-600">{entry.category}</Text>
-        <Text className="text-gray-500 dark:text-gray-400">
-          {new Date(entry.date).toLocaleTimeString()}
-        </Text>
+        <Pressable onPress={() => onDelete(entry.id)}>
+          <Trash2 size={18} color="#ef4444" />
+        </Pressable>
       </View>
       <Text className="text-gray-800 dark:text-white">{entry.content}</Text>
       <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
         Humeur : {entry.mood}/10
       </Text>
-    </View>
+    </Card>
   );
 };
 
-// Composant pour la vue complète du journal (onglet)
 const Journal = ({
   newEntry,
   setNewEntry,
@@ -35,10 +39,12 @@ const Journal = ({
   entries,
   selectedCategory,
   setSelectedCategory,
+  handleDeleteEntry,
 }: JournalTabProps) => {
   return (
     <ScrollView className="p-4">
-      <View className="mb-4 rounded-xl bg-white p-4 dark:bg-neutral-900">
+      {/* Formulaire d’entrée */}
+      <Card style={{ marginBottom: 16 }}>
         <TextInput
           placeholder="Qu'avez-vous accompli aujourd'hui ?"
           value={newEntry}
@@ -47,7 +53,6 @@ const Journal = ({
           className="h-28 rounded-lg border p-3 text-base text-black dark:text-white"
         />
 
-        {/* Sélecteur de catégorie */}
         <Text className="mt-4 font-medium text-gray-700 dark:text-gray-300">Catégorie</Text>
         <View className="mt-2 flex-row flex-wrap">
           {['Forme Physique', 'Bien-être Mental', 'Relations', 'Travail'].map((category) => (
@@ -68,7 +73,7 @@ const Journal = ({
         </View>
 
         <Text className="mt-4 font-medium text-gray-700 dark:text-gray-300">
-          Humeur (1–10) :{mood}
+          Humeur (1–10) : {mood}
         </Text>
         <TextInput
           keyboardType="numeric"
@@ -76,10 +81,13 @@ const Journal = ({
           onChangeText={(text) => setMood(Number(text))}
           className="mt-1 rounded-lg border p-2 text-black dark:text-white"
         />
+
         <View className="mt-4 flex-row items-center justify-between">
           <Pressable
             onPress={() => setIsRecording(!isRecording)}
-            className={`rounded-full p-2 ${isRecording ? 'bg-red-100' : 'bg-gray-100 dark:bg-gray-700'}`}>
+            className={`rounded-full p-2 ${
+              isRecording ? 'bg-red-100' : 'bg-gray-100 dark:bg-gray-700'
+            }`}>
             <Mic color={isRecording ? 'red' : 'white'} />
           </Pressable>
           <Pressable
@@ -89,17 +97,20 @@ const Journal = ({
             <Text className="font-semibold text-white">Enregistrer</Text>
           </Pressable>
         </View>
-      </View>
+      </Card>
 
+      {/* Liste des entrées */}
       <Text className="mb-2 text-lg font-semibold dark:text-white">Vos entrées</Text>
       {entries.length === 0 ? (
-        <View className="items-center justify-center rounded-lg bg-white p-6 dark:bg-neutral-900">
+        <Card>
           <Text className="text-center text-gray-500 dark:text-gray-400">
             Aucune entrée pour le moment.{'\n'}Commencez à journaliser vos accomplissements !
           </Text>
-        </View>
+        </Card>
       ) : (
-        entries.map((entry) => <JournalEntry key={entry.id} entry={entry} />)
+        entries.map((entry) => (
+          <JournalEntry key={entry.id} entry={entry} onDelete={handleDeleteEntry} />
+        ))
       )}
     </ScrollView>
   );

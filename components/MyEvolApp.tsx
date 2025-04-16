@@ -1,9 +1,8 @@
-// my-expo-app/components/MyEvolApp.tsx
-
 import { Book, BarChart2, Target, User, Settings, Trophy } from 'lucide-react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 import '../global.css';
 import Journal from './journal';
@@ -13,6 +12,8 @@ import Objectives from '../components/Objectives';
 import Parametres from '../components/Parametres';
 import Stats from '../components/Stats';
 import { Entry, Objective, QuietHours, Stats as StatsType } from '../types/types';
+import { saveEntries, loadEntries, saveData, loadData } from '../utils/storage';
+import Card from './ui/Card'; // ✅ On utilise Card
 
 export default function MyEvolApp() {
   const [activeTab, setActiveTab] = useState<
@@ -44,7 +45,17 @@ export default function MyEvolApp() {
     categoryDistribution: {},
   });
 
-  // ✅ Ajout d’une entrée dans le journal avec mise à jour des stats
+  useEffect(() => {
+    const loadDataOnStart = async () => {
+      const loadedEntries = await loadEntries();
+      const loadedStats = await loadData<StatsType>('myevol_stats');
+
+      if (loadedEntries) setEntries(loadedEntries);
+      if (loadedStats) setStats(loadedStats);
+    };
+    loadDataOnStart();
+  }, []);
+
   const handleAddEntry = () => {
     if (!newEntry.trim()) return;
 
@@ -56,7 +67,10 @@ export default function MyEvolApp() {
       mood,
     };
 
-    setEntries([entry, ...entries]);
+    const updatedEntries = [entry, ...entries];
+    setEntries(updatedEntries);
+    saveEntries(updatedEntries);
+
     setNewEntry('');
     setMood(5);
 
@@ -68,7 +82,7 @@ export default function MyEvolApp() {
       const level = Math.floor(total / 10) + 1;
       const moodHistory = [...(prev.moodData || []), mood].slice(-7);
 
-      return {
+      const updatedStats = {
         ...prev,
         todayEntries: prev.todayEntries + 1,
         totalEntries: total,
@@ -77,6 +91,29 @@ export default function MyEvolApp() {
         moodData: moodHistory,
         categoryDistribution: updatedDistribution,
       };
+
+      saveData('myevol_stats', updatedStats);
+      return updatedStats;
+    });
+
+    Toast.show({
+      type: 'success',
+      text1: 'Bravo 🎉',
+      text2: 'Une nouvelle réussite a été ajoutée !',
+      position: 'top',
+      visibilityTime: 2000,
+    });
+  };
+
+  const handleDeleteEntry = (id: number) => {
+    const updated = entries.filter((e) => e.id !== id);
+    setEntries(updated);
+    saveEntries(updated);
+    Toast.show({
+      type: 'error',
+      text1: 'Entrée supprimée ❌',
+      text2: 'Votre note a été supprimée.',
+      position: 'top',
     });
   };
 
@@ -94,6 +131,7 @@ export default function MyEvolApp() {
             isRecording={isRecording}
             setIsRecording={setIsRecording}
             handleAddEntry={handleAddEntry}
+            handleDeleteEntry={handleDeleteEntry}
             entries={entries}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
@@ -130,36 +168,45 @@ export default function MyEvolApp() {
   ];
 
   return (
-    <SafeAreaView className={`flex-1 ${darkMode ? 'dark' : ''} bg-gray-100 dark:bg-black`}>
-      {/* Header */}
-      <View className="bg-gradient-to-r from-purple-600 to-blue-500 p-4">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-xl font-bold text-white">MyEvol</Text>
-          <View className="flex-row items-center space-x-3">
-            <Text className="text-white">⭐ Niveau {stats.level}</Text>
-            <Text className="text-white">🔥 {stats.currentStreak} jours</Text>
-            <User color="white" />
+    <>
+      <SafeAreaView className={`flex-1 ${darkMode ? 'dark' : ''} bg-gray-100 dark:bg-black`}>
+        {/* En-tête avec Card */}
+        <Card style={{ margin: 0, borderRadius: 0 }}>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-xl font-bold text-purple-700 dark:text-white">MyEvol</Text>
+            <View className="flex-row items-center space-x-3">
+              <Text className="text-purple-700 dark:text-white">⭐ Niveau {stats.level}</Text>
+              <Text className="text-purple-700 dark:text-white">
+                🔥 {stats.currentStreak} jours
+              </Text>
+              <User color="purple" />
+            </View>
           </View>
+        </Card>
+
+        {/* Contenu dynamique */}
+        <View className="flex-1">{renderTab()}</View>
+
+        {/* Navigation inférieure */}
+        <View className="flex-row justify-around border-t bg-white py-3 dark:bg-neutral-900">
+          {tabs.map(({ name, icon: Icon }) => (
+            <Pressable
+              key={name}
+              onPress={() => setActiveTab(name as any)}
+              className="items-center">
+              <Icon color={activeTab === name ? '#9333ea' : '#6b7280'} />
+              <Text
+                className={`${
+                  activeTab === name ? 'text-purple-600' : 'text-gray-500'
+                } dark:text-white`}>
+                {name}
+              </Text>
+            </Pressable>
+          ))}
         </View>
-      </View>
+      </SafeAreaView>
 
-      {/* Contenu */}
-      <View className="flex-1">{renderTab()}</View>
-
-      {/* Navigation */}
-      <View className="flex-row justify-around border-t bg-white py-3 dark:bg-neutral-900">
-        {tabs.map(({ name, icon: Icon }) => (
-          <Pressable key={name} onPress={() => setActiveTab(name as any)} className="items-center">
-            <Icon color={activeTab === name ? '#9333ea' : '#6b7280'} />
-            <Text
-              className={`${
-                activeTab === name ? 'text-purple-600' : 'text-gray-500'
-              } dark:text-white`}>
-              {name}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-    </SafeAreaView>
+      <Toast />
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { Text, ScrollView, Alert } from 'react-native';
 
 import BadgeCard from './BadgeCard';
 import ChallengeCard from './ChallengeCard';
+import Card from './ui/Card'; // ✅ Composant réutilisable avec shadow
 import { Badge, Challenge } from '../types/types';
 
 const Gamification = () => {
@@ -44,25 +45,31 @@ const Gamification = () => {
   ]);
 
   const joinChallenge = (id: number) => {
-    setChallenges((prevChallenges) =>
-      prevChallenges.map((c) => (c.id === id ? { ...c, progress: c.progress + 1 } : c))
+    setChallenges((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, progress: Math.min(c.progress + 1, c.totalDays) } : c))
     );
-    Alert.alert('Défi rejoint 🎯', `Vous avez rejoint le défi !`);
+    Alert.alert('Défi rejoint 🎯', `Vous avez progressé dans ce défi !`);
   };
 
   return (
     <ScrollView className="p-4">
       <Text className="mb-4 text-xl font-bold text-pink-600 dark:text-white">Gamification</Text>
 
-      <Text className="mb-2 text-lg font-semibold dark:text-white">🎯 Défis en cours</Text>
-      {challenges.map((c) => (
-        <ChallengeCard key={c.id} challenge={c} onJoin={joinChallenge} />
-      ))}
+      {/* Section Défis */}
+      <Card style={{ marginBottom: 24 }}>
+        <Text className="mb-2 text-lg font-semibold dark:text-white">🎯 Défis en cours</Text>
+        {challenges.map((c) => (
+          <ChallengeCard key={c.id} challenge={c} onJoin={joinChallenge} />
+        ))}
+      </Card>
 
-      <Text className="mb-2 mt-6 text-lg font-semibold dark:text-white">🏅 Badges</Text>
-      {badges.map((b) => (
-        <BadgeCard key={b.id} badge={b} />
-      ))}
+      {/* Section Badges */}
+      <Card>
+        <Text className="mb-2 text-lg font-semibold dark:text-white">🏅 Badges débloqués</Text>
+        {badges.map((b) => (
+          <BadgeCard key={b.id} badge={b} />
+        ))}
+      </Card>
     </ScrollView>
   );
 };

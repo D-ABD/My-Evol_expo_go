@@ -1,6 +1,7 @@
-// components/Dashboard.tsx
 import React from 'react';
 import { View, Text } from 'react-native';
+
+import Card from './ui/Card'; // ✅ Composant centralisé pour l'ombre et le style
 
 const Dashboard = () => {
   return (
@@ -10,22 +11,22 @@ const Dashboard = () => {
       </Text>
 
       {/* Résumé Journal */}
-      <View className="mb-4 rounded-lg bg-white p-4 dark:bg-neutral-900">
+      <Card style={{ marginBottom: 16 }}>
         <Text className="text-lg font-semibold dark:text-white">Résumé du jour</Text>
         {/* TODO: humeur moyenne, entrées du jour */}
-      </View>
+      </Card>
 
       {/* Objectifs en cours */}
-      <View className="mb-4 rounded-lg bg-white p-4 dark:bg-neutral-900">
+      <Card style={{ marginBottom: 16 }}>
         <Text className="text-lg font-semibold dark:text-white">Objectifs</Text>
         {/* TODO: afficher les barres de progression */}
-      </View>
+      </Card>
 
       {/* Badges et progression */}
-      <View className="rounded-lg bg-white p-4 dark:bg-neutral-900">
+      <Card>
         <Text className="text-lg font-semibold dark:text-white">Progression & Badges</Text>
         {/* TODO: Niveau, badges débloqués */}
-      </View>
+      </Card>
     </View>
   );
 };

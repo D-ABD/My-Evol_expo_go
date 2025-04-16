@@ -43,9 +43,10 @@ export type JournalTabProps = {
   isRecording: boolean;
   setIsRecording: (value: boolean) => void;
   handleAddEntry: () => void;
+  handleDeleteEntry: (id: number) => void; // ✅ Ajouté ici
   entries: Entry[];
   selectedCategory: string;
-  setSelectedCategory: (category: string) => void; // Ajouté cette ligne
+  setSelectedCategory: (category: string) => void;
 };
 
 export type StatsTabProps = {
