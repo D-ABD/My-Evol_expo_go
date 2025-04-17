@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 
 import { Challenge } from '../types/types';
-import Card from './ui/Card'; // ✅ Utilisation du composant Card
+import Card from './ui/Card';
+import { COLORS } from '../constants/colors'; // ✅ Import des couleurs
 
 type Props = {
   challenge: Challenge;
@@ -18,9 +19,14 @@ const ChallengeCard = ({ challenge, onJoin }: Props) => {
         <Text className="text-base font-semibold dark:text-white">{challenge.title}</Text>
         {onJoin && (
           <Pressable
-            className="rounded-full bg-purple-600 px-4 py-1.5"
-            onPress={() => onJoin(challenge.id)}>
-            <Text className="text-sm font-medium text-white">Rejoindre</Text>
+            onPress={() => onJoin(challenge.id)}
+            style={{
+              backgroundColor: COLORS.purple,
+              paddingHorizontal: 16,
+              paddingVertical: 6,
+              borderRadius: 999,
+            }}>
+            <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '500' }}>Rejoindre</Text>
           </Pressable>
         )}
       </View>
@@ -34,8 +40,16 @@ const ChallengeCard = ({ challenge, onJoin }: Props) => {
           </Text>
           <Text className="text-xs text-gray-500 dark:text-gray-400">{percentage}%</Text>
         </View>
-        <View className="mt-1 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-          <View className="h-2 rounded-full bg-purple-600" style={{ width: `${percentage}%` }} />
+        <View
+          className="mt-1 h-2 w-full rounded-full"
+          style={{ backgroundColor: COLORS.grayLight }}>
+          <View
+            className="h-2 rounded-full"
+            style={{
+              width: `${percentage}%`,
+              backgroundColor: COLORS.purple,
+            }}
+          />
         </View>
       </View>
     </Card>

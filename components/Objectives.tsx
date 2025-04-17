@@ -1,8 +1,10 @@
+import { Category } from 'constants/categories';
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TextInput, Pressable } from 'react-native';
 
 import { ObjectivesTabProps, Objective } from '../types/types';
 import Card from './ui/Card';
+import { COLORS } from '../constants/colors'; // ✅ Couleurs centralisées
 
 const Objectives = ({ objectives }: ObjectivesTabProps) => {
   const [allObjectives, setAllObjectives] = useState(objectives);
@@ -14,7 +16,7 @@ const Objectives = ({ objectives }: ObjectivesTabProps) => {
 
     const newObj: Objective = {
       id: Date.now(),
-      category: newCategory,
+      category: newCategory as Category, // ✅ assertion de type
       target: Number(newTarget),
       current: 0,
       percentage: 0,
@@ -27,11 +29,15 @@ const Objectives = ({ objectives }: ObjectivesTabProps) => {
 
   return (
     <ScrollView className="p-4">
-      <Text className="mb-4 text-xl font-bold text-purple-600 dark:text-white">🎯 Objectifs</Text>
+      <Text style={{ color: COLORS.purple }} className="mb-4 text-xl font-bold">
+        🎯 Objectifs
+      </Text>
 
       {/* 🔽 Formulaire d’ajout */}
       <Card className="mb-4">
-        <Text className="mb-2 text-base font-medium dark:text-white">Ajouter un objectif</Text>
+        <Text style={{ color: COLORS.white }} className="mb-2 text-base font-medium">
+          Ajouter un objectif
+        </Text>
         <TextInput
           placeholder="Catégorie"
           value={newCategory}
@@ -47,11 +53,13 @@ const Objectives = ({ objectives }: ObjectivesTabProps) => {
         />
         <Pressable
           onPress={handleAddObjective}
-          className={`rounded-lg bg-purple-600 px-4 py-2 ${
-            !newCategory.trim() || !newTarget.trim() ? 'opacity-50' : ''
+          className={`rounded-lg px-4 py-2 ${
+            !newCategory.trim() || !newTarget.trim() ? 'bg-gray-400 opacity-50' : 'bg-purple-600'
           }`}
           disabled={!newCategory.trim() || !newTarget.trim()}>
-          <Text className="text-center font-semibold text-white">Ajouter</Text>
+          <Text style={{ color: COLORS.white }} className="text-center font-semibold">
+            Ajouter
+          </Text>
         </Pressable>
       </Card>
 
@@ -59,16 +67,23 @@ const Objectives = ({ objectives }: ObjectivesTabProps) => {
       {allObjectives.map((obj) => (
         <Card key={obj.id} className="mb-4">
           <View className="mb-2 flex-row justify-between">
-            <Text className="text-base font-medium dark:text-white">{obj.category}</Text>
-            <Text className="text-sm text-gray-500 dark:text-gray-400">
+            <Text style={{ color: COLORS.white }} className="text-base font-medium">
+              {obj.category}
+            </Text>
+            <Text style={{ color: COLORS.grayLight }} className="text-sm">
               {obj.current}/{obj.target}
             </Text>
           </View>
 
-          <View className="h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+          <View
+            className="h-3 w-full overflow-hidden rounded-full"
+            style={{ backgroundColor: COLORS.grayLight }}>
             <View
-              className="h-3 rounded-full bg-purple-600"
-              style={{ width: `${obj.percentage}%` }}
+              className="h-3 rounded-full"
+              style={{
+                width: `${obj.percentage}%`,
+                backgroundColor: COLORS.purple,
+              }}
             />
           </View>
         </Card>

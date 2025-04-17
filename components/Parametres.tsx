@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, Switch } from 'react-native';
 
 import { SettingsTabProps } from '../types/types';
-import Card from './ui/Card'; // ✅ Composant Card centralisé
+import Card from './ui/Card';
+import { COLORS } from '../constants/colors'; // ✅ Import des couleurs centralisées
 
 const Parametres = ({
   darkMode,
@@ -15,7 +16,11 @@ const Parametres = ({
     {/* Carte : Mode sombre */}
     <Card>
       <View className="flex-row items-center justify-between">
-        <Text className="text-base font-medium dark:text-white">🌙 Mode sombre</Text>
+        <Text
+          className="text-base font-medium dark:text-white"
+          style={{ color: darkMode ? COLORS.white : COLORS.black }}>
+          🌙 Mode sombre
+        </Text>
         <Switch value={darkMode} onValueChange={setDarkMode} />
       </View>
     </Card>
@@ -23,15 +28,25 @@ const Parametres = ({
     {/* Carte : Notifications */}
     <Card>
       <View className="flex-row items-center justify-between">
-        <Text className="text-base font-medium dark:text-white">🔔 Notifications</Text>
+        <Text
+          className="text-base font-medium dark:text-white"
+          style={{ color: darkMode ? COLORS.white : COLORS.black }}>
+          🔔 Notifications
+        </Text>
         <Switch value={notifications} onValueChange={setNotifications} />
       </View>
     </Card>
 
     {/* Carte : Heures de silence */}
     <Card>
-      <Text className="mb-1 text-base font-medium dark:text-white">🕐 Heures de silence</Text>
-      <Text className="text-gray-600 dark:text-gray-400">
+      <Text
+        className="mb-1 text-base font-medium dark:text-white"
+        style={{ color: darkMode ? COLORS.white : COLORS.black }}>
+        🕐 Heures de silence
+      </Text>
+      <Text
+        className="text-gray-600 dark:text-gray-400"
+        style={{ color: darkMode ? COLORS.grayDark : COLORS.grayLight }}>
         {quietHours.start} - {quietHours.end}
       </Text>
     </Card>

@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, Image } from 'react-native';
 
 import { Badge } from '../types/types';
-import Card from './ui/Card'; // ✅ Composant Card réutilisable
+import Card from './ui/Card';
+import { COLORS } from '../constants/colors'; // ✅ Import des couleurs centralisées
 
 type Props = {
   badge: Badge;
@@ -12,9 +13,9 @@ const BadgeCard = ({ badge }: Props) => {
   return (
     <Card
       style={{
-        borderColor: badge.unlocked ? '#9333ea' : '#d1d5db',
+        borderColor: badge.unlocked ? COLORS.purple : COLORS.grayLight,
         borderWidth: 1,
-        backgroundColor: badge.unlocked ? 'white' : undefined,
+        backgroundColor: badge.unlocked ? COLORS.white : undefined,
       }}>
       <View className="flex-row items-center space-x-4">
         <Image
@@ -31,7 +32,9 @@ const BadgeCard = ({ badge }: Props) => {
           </Text>
           <Text className="text-sm text-gray-500 dark:text-gray-300">{badge.description}</Text>
           {badge.unlocked && badge.date && (
-            <Text className="mt-1 text-xs text-green-600">Débloqué le {badge.date}</Text>
+            <Text className="mt-1 text-xs" style={{ color: COLORS.green }}>
+              Débloqué le {badge.date}
+            </Text>
           )}
         </View>
       </View>

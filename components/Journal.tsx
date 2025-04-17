@@ -2,7 +2,9 @@ import { Mic, Trash2 } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, TextInput, ScrollView, Pressable } from 'react-native';
 
-import Card from './ui/Card'; // ✅ Remplace le style shadow
+import Card from './ui/Card';
+import { CATEGORIES, Category } from '../constants/categories'; // ✅ Catégories centralisées
+import { COLORS } from '../constants/colors';
 import { Entry, JournalTabProps } from '../types/types';
 
 export const JournalEntry = ({
@@ -15,9 +17,9 @@ export const JournalEntry = ({
   return (
     <Card style={{ marginBottom: 8 }}>
       <View className="mb-1 flex-row items-center justify-between">
-        <Text className="text-purple-600">{entry.category}</Text>
+        <Text style={{ color: COLORS.purple }}>{entry.category}</Text>
         <Pressable onPress={() => onDelete(entry.id)}>
-          <Trash2 size={18} color="#ef4444" />
+          <Trash2 size={18} color={COLORS.red} />
         </Pressable>
       </View>
       <Text className="text-gray-800 dark:text-white">{entry.content}</Text>
@@ -55,21 +57,22 @@ const Journal = ({
 
         <Text className="mt-4 font-medium text-gray-700 dark:text-gray-300">Catégorie</Text>
         <View className="mt-2 flex-row flex-wrap">
-          {['Forme Physique', 'Bien-être Mental', 'Relations', 'Travail'].map((category) => (
-            <Pressable
-              key={category}
-              onPress={() => setSelectedCategory(category)}
-              className={`mb-2 mr-2 rounded-full px-3 py-1 ${
-                selectedCategory === category ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-700'
-              }`}>
-              <Text
-                className={`${
-                  selectedCategory === category ? 'text-white' : 'text-gray-700 dark:text-gray-300'
+          {CATEGORIES.map((category: Category) => {
+            const isSelected = selectedCategory === category;
+            return (
+              <Pressable
+                key={category}
+                onPress={() => setSelectedCategory(category)}
+                className={`mb-2 mr-2 rounded-full px-3 py-1 ${
+                  isSelected ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-700'
                 }`}>
-                {category}
-              </Text>
-            </Pressable>
-          ))}
+                <Text
+                  className={`${isSelected ? 'text-white' : 'text-gray-700 dark:text-gray-300'}`}>
+                  {category}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
 
         <Text className="mt-4 font-medium text-gray-700 dark:text-gray-300">
@@ -88,7 +91,7 @@ const Journal = ({
             className={`rounded-full p-2 ${
               isRecording ? 'bg-red-100' : 'bg-gray-100 dark:bg-gray-700'
             }`}>
-            <Mic color={isRecording ? 'red' : 'white'} />
+            <Mic color={isRecording ? COLORS.red : COLORS.white} />
           </Pressable>
           <Pressable
             onPress={handleAddEntry}

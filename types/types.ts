@@ -1,10 +1,12 @@
 // Définition des types principaux de l'application MyEvol
 
+import type { Category } from '../constants/categories';
+
 // Type pour les entrées du journal
 export type Entry = {
   id: number;
   content: string;
-  category: string;
+  category: Category;
   date: string;
   mood: number;
 };
@@ -12,7 +14,7 @@ export type Entry = {
 // Type pour les objectifs
 export type Objective = {
   id: number;
-  category: string;
+  category: Category; // ✅ au lieu de string
   target: number;
   current: number;
   percentage: number;
@@ -30,8 +32,8 @@ export type Stats = {
   totalEntries: number;
   currentStreak: number;
   level: number;
-  moodData?: number[]; // Propriété optionnelle
-  categoryDistribution?: Record<string, number>; // Propriété optionnelle
+  moodData?: number[];
+  categoryDistribution?: Record<Category, number>;
 };
 
 // Types pour les props des composants
@@ -45,8 +47,8 @@ export type JournalTabProps = {
   handleAddEntry: () => void;
   handleDeleteEntry: (id: number) => void;
   entries: Entry[];
-  selectedCategory: string;
-  setSelectedCategory: (category: string) => void;
+  selectedCategory: Category;
+  setSelectedCategory: (category: Category) => void;
 };
 
 export type StatsTabProps = {

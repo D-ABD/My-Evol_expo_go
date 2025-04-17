@@ -11,6 +11,9 @@ import Gamification from '../components/Gamification';
 import Objectives from '../components/Objectives';
 import Parametres from '../components/Parametres';
 import Stats from '../components/Stats';
+import { DEFAULT_BADGES } from '../constants/badges';
+import { Category, CATEGORIES } from '../constants/categories';
+import { DEFAULT_OBJECTIVES } from '../constants/objectives';
 import { Entry, Objective, QuietHours, Stats as StatsType, Badge } from '../types/types';
 import {
   saveEntries,
@@ -21,6 +24,11 @@ import {
   loadObjectives,
 } from '../utils/storage';
 import Card from './ui/Card';
+import { COLORS } from '../constants/colors';
+
+// ✅ Utilitaire pour initialiser la distribution
+const createEmptyCategoryDistribution = (): Record<Category, number> =>
+  Object.fromEntries(CATEGORIES.map((cat) => [cat, 0])) as Record<Category, number>;
 
 export default function MyEvolApp() {
   const [activeTab, setActiveTab] = useState<
@@ -33,7 +41,7 @@ export default function MyEvolApp() {
 
   const [entries, setEntries] = useState<Entry[]>([]);
   const [newEntry, setNewEntry] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Bien-être Mental');
+  const [selectedCategory, setSelectedCategory] = useState<Category>('Bien-être Mental');
   const [mood, setMood] = useState(5);
   const [isRecording, setIsRecording] = useState(false);
 
@@ -46,7 +54,7 @@ export default function MyEvolApp() {
     currentStreak: 7,
     level: 5,
     moodData: [],
-    categoryDistribution: {},
+    categoryDistribution: createEmptyCategoryDistribution(),
   });
 
   useEffect(() => {
@@ -54,40 +62,28 @@ export default function MyEvolApp() {
       const [loadedEntries, loadedStats, loadedObjectives] = await Promise.all([
         loadEntries(),
         loadData<StatsType>('myevol_stats'),
-        loadObjectives(), // ✅ Utilise la fonction dédiée
+        loadObjectives(),
       ]);
 
       if (loadedEntries) setEntries(loadedEntries);
-      if (loadedStats) setStats(loadedStats);
+      if (loadedStats)
+        setStats((prev) => ({
+          ...prev,
+          ...loadedStats,
+          categoryDistribution: {
+            ...createEmptyCategoryDistribution(),
+            ...(loadedStats.categoryDistribution || {}),
+          },
+        }));
 
       if (!loadedObjectives || loadedObjectives.length === 0) {
-        const defaultObjectives: Objective[] = [
-          { id: 1, category: 'Forme Physique', target: 5, current: 2, percentage: 40 },
-          { id: 2, category: 'Bien-être Mental', target: 3, current: 3, percentage: 100 },
-        ];
-        setObjectives(defaultObjectives);
-        saveObjectives(defaultObjectives);
+        setObjectives(DEFAULT_OBJECTIVES);
+        saveObjectives(DEFAULT_OBJECTIVES);
       } else {
         setObjectives(loadedObjectives);
       }
 
-      setBadges([
-        {
-          id: 1,
-          name: 'Premier pas',
-          icon: 'https://cdn-icons-png.flaticon.com/512/3909/3909444.png',
-          description: 'Créer une première entrée',
-          unlocked: true,
-          date: '2025-04-14',
-        },
-        {
-          id: 2,
-          name: 'Série de 7 jours',
-          icon: 'https://cdn-icons-png.flaticon.com/512/888/888879.png',
-          description: '7 jours consécutifs',
-          unlocked: false,
-        },
-      ]);
+      setBadges(DEFAULT_BADGES);
     };
 
     loadDataOnStart();
@@ -112,21 +108,26 @@ export default function MyEvolApp() {
     setMood(5);
 
     setStats((prev) => {
-      const updatedDistribution = { ...prev.categoryDistribution };
-      updatedDistribution[selectedCategory] = (updatedDistribution[selectedCategory] || 0) + 1;
+      const updatedDistribution = {
+        ...createEmptyCategoryDistribution(),
+        ...prev.categoryDistribution,
+      };
+      updatedDistribution[selectedCategory] = (updatedDistribution[selectedCategory] ?? 0) + 1;
 
       const total = prev.totalEntries + 1;
       const level = Math.floor(total / 10) + 1;
       const moodHistory = [...(prev.moodData || []), mood].slice(-7);
 
-      const updatedStats = {
+      updatedDistribution[selectedCategory] += 1;
+
+      const updatedStats: StatsType = {
         ...prev,
         todayEntries: prev.todayEntries + 1,
         totalEntries: total,
         currentStreak: prev.currentStreak + 1,
         level,
         moodData: moodHistory,
-        categoryDistribution: updatedDistribution,
+        categoryDistribution: updatedDistribution, // ✅ plus d’erreur ici
       };
 
       saveData('myevol_stats', updatedStats);
@@ -227,13 +228,17 @@ export default function MyEvolApp() {
       <SafeAreaView className={`flex-1 ${darkMode ? 'dark' : ''} bg-gray-100 dark:bg-black`}>
         <Card style={{ margin: 0, borderRadius: 0 }}>
           <View className="flex-row items-center justify-between">
-            <Text className="text-xl font-bold text-purple-700 dark:text-white">MyEvol</Text>
+            <Text style={{ color: COLORS.purple }} className="text-xl font-bold dark:text-white">
+              MyEvol
+            </Text>
             <View className="flex-row items-center space-x-3">
-              <Text className="text-purple-700 dark:text-white">⭐ Niveau {stats.level}</Text>
-              <Text className="text-purple-700 dark:text-white">
+              <Text style={{ color: COLORS.purple }} className="dark:text-white">
+                ⭐ Niveau {stats.level}
+              </Text>
+              <Text style={{ color: COLORS.purple }} className="dark:text-white">
                 🔥 {stats.currentStreak} jours
               </Text>
-              <User color="purple" />
+              <User color={COLORS.purple} />
             </View>
           </View>
         </Card>
@@ -246,11 +251,11 @@ export default function MyEvolApp() {
               key={name}
               onPress={() => setActiveTab(name as any)}
               className="items-center">
-              <Icon color={activeTab === name ? '#9333ea' : '#6b7280'} />
+              <Icon color={activeTab === name ? COLORS.purple : COLORS.grayDark} />
               <Text
-                className={`${
+                className={`dark:text-white ${
                   activeTab === name ? 'text-purple-600' : 'text-gray-500'
-                } dark:text-white`}>
+                }`}>
                 {name}
               </Text>
             </Pressable>
