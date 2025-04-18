@@ -2,21 +2,24 @@ import React from 'react';
 import { View, Text } from 'react-native';
 
 import Card from './ui/Card';
-import { COLORS } from '../constants/colors'; // ✅ Import des couleurs
+import { COLORS } from '../constants/colors';
 import { DashboardProps } from '../types/types';
 
-const Dashboard = ({ stats, objectives, badges }: DashboardProps) => {
+const Dashboard: React.FC<DashboardProps> = ({ stats, objectives, badges }) => {
   const moodData = stats.moodData ?? [];
   const moodAvg =
     moodData.length > 0 ? (moodData.reduce((a, b) => a + b, 0) / moodData.length).toFixed(1) : '—';
 
+  const unlockedBadgesCount = badges.filter((b) => b.unlocked).length;
+
   return (
     <View className="p-4">
+      {/* 🏠 Titre */}
       <Text className="mb-4 text-xl font-bold dark:text-white" style={{ color: COLORS.purple }}>
         🏠 Tableau de bord
       </Text>
 
-      {/* ✅ Résumé journalier */}
+      {/* 📊 Résumé du jour */}
       <Card style={{ marginBottom: 16 }}>
         <Text className="mb-2 text-lg font-semibold dark:text-white">Résumé du jour</Text>
         <Text style={{ color: COLORS.grayDark }} className="dark:text-gray-300">
@@ -26,7 +29,7 @@ const Dashboard = ({ stats, objectives, badges }: DashboardProps) => {
           ✍️ Entrées aujourd’hui : {stats.todayEntries}
         </Text>
 
-        {/* ✅ Graphique de l'humeur */}
+        {/* 📈 Graphique humeur */}
         {moodData.length > 0 && (
           <View className="mt-4 h-28">
             <View className="absolute h-full w-full justify-between">
@@ -42,11 +45,11 @@ const Dashboard = ({ stats, objectives, badges }: DashboardProps) => {
               {moodData.map((value, index) => (
                 <View
                   key={index}
+                  className="mx-0.5 w-6 rounded-t-md"
                   style={{
                     height: `${(value / 10) * 100}%`,
                     backgroundColor: COLORS.purple,
                   }}
-                  className="mx-0.5 w-6 rounded-t-md"
                 />
               ))}
             </View>
@@ -61,33 +64,37 @@ const Dashboard = ({ stats, objectives, badges }: DashboardProps) => {
         )}
       </Card>
 
-      {/* ✅ Objectifs */}
+      {/* 🎯 Objectifs */}
       <Card style={{ marginBottom: 16 }}>
         <Text className="mb-2 text-lg font-semibold dark:text-white">🎯 Objectifs</Text>
-        {objectives.length === 0 && (
+        {objectives.length === 0 ? (
           <Text className="text-gray-500 dark:text-gray-400">Aucun objectif pour l’instant.</Text>
-        )}
-        {objectives.map((obj) => (
-          <View key={obj.id} className="mb-2">
-            <View className="flex-row justify-between">
-              <Text className="text-sm font-medium dark:text-white">{obj.category}</Text>
-              <Text className="text-sm text-gray-500 dark:text-gray-400">
-                {obj.current}/{obj.target}
-              </Text>
-            </View>
-            <View
-              className="mt-1 h-2 w-full rounded-full"
-              style={{ backgroundColor: COLORS.grayLight }}>
+        ) : (
+          objectives.map((obj) => (
+            <View key={obj.id} className="mb-2">
+              <View className="flex-row justify-between">
+                <Text className="text-sm font-medium dark:text-white">{obj.category}</Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                  {obj.current}/{obj.target}
+                </Text>
+              </View>
               <View
-                className="h-2 rounded-full"
-                style={{ width: `${obj.percentage}%`, backgroundColor: COLORS.purple }}
-              />
+                className="mt-1 h-2 w-full rounded-full"
+                style={{ backgroundColor: COLORS.grayLight }}>
+                <View
+                  className="h-2 rounded-full"
+                  style={{
+                    width: `${obj.percentage}%`,
+                    backgroundColor: COLORS.purple,
+                  }}
+                />
+              </View>
             </View>
-          </View>
-        ))}
+          ))
+        )}
       </Card>
 
-      {/* ✅ Progression & Badges */}
+      {/* 🏅 Progression */}
       <Card>
         <Text className="mb-2 text-lg font-semibold dark:text-white">🏅 Progression</Text>
         <Text style={{ color: COLORS.grayDark }} className="dark:text-gray-300">
@@ -97,7 +104,7 @@ const Dashboard = ({ stats, objectives, badges }: DashboardProps) => {
           🔥 Série : {stats.currentStreak} jours
         </Text>
         <Text style={{ color: COLORS.grayDark }} className="dark:text-gray-300">
-          🎖️ Badges débloqués : {badges.filter((b) => b.unlocked).length}
+          🎖️ Badges débloqués : {unlockedBadgesCount}
         </Text>
       </Card>
     </View>

@@ -3,7 +3,7 @@ import { View, Text, Pressable } from 'react-native';
 
 import { Challenge } from '../types/types';
 import Card from './ui/Card';
-import { COLORS } from '../constants/colors'; // ✅ Import des couleurs
+import { COLORS } from '../constants/colors';
 
 type Props = {
   challenge: Challenge;
@@ -11,15 +11,17 @@ type Props = {
 };
 
 const ChallengeCard = ({ challenge, onJoin }: Props) => {
-  const percentage = Math.round((challenge.progress / challenge.totalDays) * 100);
+  const { id, title, description, progress, totalDays } = challenge;
+  const percentage = Math.round((progress / totalDays) * 100);
 
   return (
     <Card style={{ marginBottom: 16 }}>
+      {/* 🏷️ Titre et bouton */}
       <View className="mb-2 flex-row items-center justify-between">
-        <Text className="text-base font-semibold dark:text-white">{challenge.title}</Text>
+        <Text className="text-base font-semibold dark:text-white">{title}</Text>
         {onJoin && (
           <Pressable
-            onPress={() => onJoin(challenge.id)}
+            onPress={() => onJoin(id)}
             style={{
               backgroundColor: COLORS.purple,
               paddingHorizontal: 16,
@@ -31,15 +33,18 @@ const ChallengeCard = ({ challenge, onJoin }: Props) => {
         )}
       </View>
 
-      <Text className="text-sm text-gray-500 dark:text-gray-300">{challenge.description}</Text>
+      {/* 📝 Description */}
+      <Text className="text-sm text-gray-500 dark:text-gray-300">{description}</Text>
 
+      {/* 📊 Barre de progression */}
       <View className="mt-3">
         <View className="flex-row justify-between">
           <Text className="text-xs text-gray-500 dark:text-gray-400">
-            {challenge.progress}/{challenge.totalDays} jours
+            {progress}/{totalDays} jours
           </Text>
           <Text className="text-xs text-gray-500 dark:text-gray-400">{percentage}%</Text>
         </View>
+
         <View
           className="mt-1 h-2 w-full rounded-full"
           style={{ backgroundColor: COLORS.grayLight }}>

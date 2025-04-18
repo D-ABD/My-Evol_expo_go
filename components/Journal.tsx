@@ -1,19 +1,22 @@
 import { Mic, Trash2 } from 'lucide-react-native';
-import React from 'react';
 import { View, Text, TextInput, ScrollView, Pressable } from 'react-native';
 
 import Card from './ui/Card';
-import { CATEGORIES, Category } from '../constants/categories'; // ✅ Catégories centralisées
+import { CATEGORIES } from '../constants/categories';
 import { COLORS } from '../constants/colors';
-import { Entry, JournalTabProps } from '../types/types';
+import { JournalTabProps } from '../types/types';
 
-export const JournalEntry = ({
-  entry,
-  onDelete,
-}: {
-  entry: Entry;
+type JournalEntryProps = {
+  entry: {
+    id: number;
+    category: string;
+    content: string;
+    mood: number;
+  };
   onDelete: (id: number) => void;
-}) => {
+};
+
+const JournalEntry = ({ entry, onDelete }: JournalEntryProps) => {
   return (
     <Card style={{ marginBottom: 8 }}>
       <View className="mb-1 flex-row items-center justify-between">
@@ -38,14 +41,14 @@ const Journal = ({
   isRecording,
   setIsRecording,
   handleAddEntry,
+  handleDeleteEntry,
   entries,
   selectedCategory,
   setSelectedCategory,
-  handleDeleteEntry,
 }: JournalTabProps) => {
   return (
     <ScrollView className="p-4">
-      {/* Formulaire d’entrée */}
+      {/* 📝 Formulaire d’entrée */}
       <Card style={{ marginBottom: 16 }}>
         <TextInput
           placeholder="Qu'avez-vous accompli aujourd'hui ?"
@@ -57,7 +60,7 @@ const Journal = ({
 
         <Text className="mt-4 font-medium text-gray-700 dark:text-gray-300">Catégorie</Text>
         <View className="mt-2 flex-row flex-wrap">
-          {CATEGORIES.map((category: Category) => {
+          {CATEGORIES.map((category) => {
             const isSelected = selectedCategory === category;
             return (
               <Pressable
@@ -93,6 +96,7 @@ const Journal = ({
             }`}>
             <Mic color={isRecording ? COLORS.red : COLORS.white} />
           </Pressable>
+
           <Pressable
             onPress={handleAddEntry}
             className={`rounded-lg bg-purple-600 px-4 py-2 ${!newEntry.trim() ? 'opacity-50' : ''}`}
@@ -102,7 +106,7 @@ const Journal = ({
         </View>
       </Card>
 
-      {/* Liste des entrées */}
+      {/* 📜 Liste des entrées */}
       <Text className="mb-2 text-lg font-semibold dark:text-white">Vos entrées</Text>
       {entries.length === 0 ? (
         <Card>

@@ -1,6 +1,6 @@
 // Définition des types principaux de l'application MyEvol
-
-import type { Category } from '../constants/categories';
+import type { Category } from '../constants/categories'; // ✅ import classique (et non plus "type only")
+export { Category };
 
 // Type pour les entrées du journal
 export type Entry = {

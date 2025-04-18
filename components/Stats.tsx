@@ -1,3 +1,4 @@
+import { CATEGORIES, Category } from 'constants/categories';
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 
@@ -9,11 +10,12 @@ const Stats = ({ stats }: StatsTabProps) => {
   const moodData = stats.moodData || [5, 6, 7, 6, 8, 7, 9];
   const maxMoodValue = 10;
 
-  const categoryData = stats.categoryDistribution || {
-    'Forme Physique': 4,
-    'Bien-être Mental': 6,
-    Relations: 2,
-    Travail: 5,
+  const createEmptyCategoryDistribution = (): Record<Category, number> =>
+    Object.fromEntries(CATEGORIES.map((cat) => [cat, 0])) as Record<Category, number>;
+
+  const categoryData = {
+    ...createEmptyCategoryDistribution(),
+    ...(stats.categoryDistribution || {}),
   };
   const maxCategoryValue = Math.max(...Object.values(categoryData));
 
@@ -23,13 +25,13 @@ const Stats = ({ stats }: StatsTabProps) => {
       <View className="mb-4 flex-row justify-between">
         <Card className="w-[48%]">
           <Text style={{ color: COLORS.grayDark }}>Aujourd'hui</Text>
-          <Text style={{ color: COLORS.white }} className="text-2xl font-bold">
+          <Text style={{ color: COLORS.black }} className="text-2xl font-bold">
             {stats.todayEntries}
           </Text>
         </Card>
         <Card className="w-[48%]">
           <Text style={{ color: COLORS.grayDark }}>Total</Text>
-          <Text style={{ color: COLORS.white }} className="text-2xl font-bold">
+          <Text style={{ color: COLORS.black }} className="text-2xl font-bold">
             {stats.totalEntries}
           </Text>
         </Card>
@@ -39,13 +41,13 @@ const Stats = ({ stats }: StatsTabProps) => {
       <View className="mb-4 flex-row justify-between">
         <Card className="w-[48%]">
           <Text style={{ color: COLORS.grayDark }}>Série actuelle</Text>
-          <Text style={{ color: COLORS.white }} className="text-2xl font-bold">
+          <Text style={{ color: COLORS.black }} className="text-2xl font-bold">
             {stats.currentStreak} jours
           </Text>
         </Card>
         <Card className="w-[48%]">
           <Text style={{ color: COLORS.grayDark }}>Niveau</Text>
-          <Text style={{ color: COLORS.white }} className="text-2xl font-bold">
+          <Text style={{ color: COLORS.black }} className="text-2xl font-bold">
             {stats.level}
           </Text>
         </Card>
